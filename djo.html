@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculatrice de Moyenne (Dentisterie)</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0e1a3a;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.16);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --accent:#7c5cff;
+      --accent2:#23c4ff;
+      --good:#2ee59d;
+      --warn:#ffcc66;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(124,92,255,.30), transparent 60%),
+        radial-gradient(1000px 600px at 85% 0%, rgba(35,196,255,.25), transparent 55%),
+        radial-gradient(900px 700px at 65% 100%, rgba(46,229,157,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 26px 16px 40px;
+    }
+
+    header{
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .title{
+      display:flex; flex-direction:column; gap:6px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(10px);
+      width: fit-content;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    h1{
+      margin:0;
+      font-size: clamp(20px, 2.8vw, 32px);
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size: 14.5px;
+      max-width: 64ch;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1.45fr .85fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    @media (max-width: 900px){
+      .layout{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.06));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(14px);
+    }
+
+    .card .head{
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .card .head h2{
+      margin:0;
+      font-size: 15px;
+      letter-spacing:.2px;
+      color: rgba(255,255,255,.85);
+    }
+
+    .hint{
+      margin:0;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .table{
+      padding: 12px 12px 14px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1.2fr .5fr .9fr;
+      gap:10px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      transition: transform .15s ease, background .15s ease;
+    }
+
+    .row:hover{
+      background: rgba(255,255,255,.06);
+      transform: translateY(-1px);
+    }
+
+    .row.header{
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    .row.header div{
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing:.3px;
+      text-transform: uppercase;
+    }
+
+    .matiere{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+
+    .matiere .name{
+      font-size: 14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .matiere .coef{
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .coefBox{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      border-radius: 12px;
+      height: 42px;
+      font-weight: 700;
+      color: rgba(255,255,255,.90);
+    }
+
+    input[type="text"]{
+      width: 100%;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(10, 14, 28, .55);
+      color: var(--text);
+      padding: 0 12px;
+      outline: none;
+      font-size: 14px;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    input[type="text"]::placeholder{ color: rgba(255,255,255,.45); }
+
+    input[type="text"]:focus{
+      border-color: rgba(124,92,255,.70);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.18);
+    }
+
+    .side{
+      padding: 16px;
+      position: sticky;
+      top: 16px;
+    }
+
+    @media (max-width: 900px){
+      .side{ position: static; }
+    }
+
+    .result{
+      background: linear-gradient(180deg, rgba(124,92,255,.25), rgba(35,196,255,.14));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .result .label{
+      font-size: 12.5px;
+      color: rgba(255,255,255,.78);
+      margin-bottom: 6px;
+    }
+
+    .result .value{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .big{
+      font-size: 44px;
+      line-height:1;
+      font-weight: 900;
+      letter-spacing: .5px;
+    }
+
+    .over20{
+      font-size: 14px;
+      color: rgba(255,255,255,.78);
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top: 12px;
+    }
+
+    .stat{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 62px;
+    }
+
+    .stat .k{
+      color: var(--muted);
+      font-size: 12.5px;
+      margin-bottom: 6px;
+    }
+
+    .stat .v{
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top: 12px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 800;
+      color: var(--text);
+      flex: 1 1 160px;
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    button:active{ transform: translateY(1px); }
+
+    .btn-primary{
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 30px rgba(124,92,255,.22);
+    }
+    .btn-ghost{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .note{
+      margin-top: 12px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height:1.5;
+    }
+
+    .toast{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.85);
+      display:none;
+    }
+
+    .toast.show{ display:block; }
+
+    .ok{ border-color: rgba(46,229,157,.35); }
+    .warn{ border-color: rgba(255,204,102,.35); }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <div class="badge">🎓 Calculatrice • Moyenne pondérée (coefficients)</div>
+        <h1>Calcul de la moyenne des examen 1/3 <h1> </h1>
+        <p class="subtitle">
+          By B.D
+        </p>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- LISTE MATIERES -->
+      <section class="card">
+        <div class="head">
+          <div>
+            <h2>Matières & Notes</h2>
+            <p class="hint">Astuce : tu peux écrire <b>12,5</b> ou <b>12.5</b>.</p>
+          </div>
+          <div class="badge" id="coefTotalBadge">Σ Coefficients : …</div>
+        </div>
+
+        <div class="table" id="table">
+          <div class="row header">
+            <div>Matière</div>
+            <div style="text-align:center">Coef</div>
+            <div>Note /20</div>
+          </div>
+          <!-- rows injected by JS -->
+        </div>
+      </section>
+
+      <!-- RESULTATS -->
+      <aside class="card side">
+        <div class="result" id="resultBox">
+          <div class="label">Moyenne pondérée</div>
+          <div class="value">
+            <div class="big" id="moyenne">—</div>
+            <div class="over20">/ 20</div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="k">Somme (note × coef)</div>
+              <div class="v" id="sumPondere">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">Coefficients pris en compte</div>
+              <div class="v" id="coefPris">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" id="btnCalc">Calculer</button>
+          <button class="btn-ghost" id="btnReset" type="button">Réinitialiser</button>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <p class="note">
+          ✅ Les cases vides ne sont pas comptées. <br/>
+          ⚠️ Les notes doivent être entre 0 et 20.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Données des matières + coefficients
+    const subjects = [
+      { name: "Hygiène", coef: 1 },
+      { name: "Parodontologie", coef: 3 },
+      { name: "ODF", coef: 3 },
+      { name: "Patho", coef: 3 },
+      { name: "Anglais", coef: 1 },
+      { name: "Prothèse", coef: 5 },
+      { name: "Anadent", coef: 3 },
+      { name: "Histologie", coef: 2 },
+      { name: "Microbiologie", coef: 2 },
+      { name: "Anatomie-hu", coef: 4 },
+      { name: "OC", coef: 5 },
+      { name: "Biomatériaux", coef: 2 },
+      { name: "Informatique", coef: 1 }
+    ];
+
+    const table = document.getElementById("table");
+    const moyenneEl = document.getElementById("moyenne");
+    const sumPondereEl = document.getElementById("sumPondere");
+    const coefPrisEl = document.getElementById("coefPris");
+    const coefTotalBadge = document.getElementById("coefTotalBadge");
+    const resultBox = document.getElementById("resultBox");
+    const toast = document.getElementById("toast");
+
+    const totalCoef = subjects.reduce((a,s)=>a+s.coef, 0);
+    coefTotalBadge.textContent = "Σ Coefficients : " + totalCoef;
+
+    // إنشاء صفوف الجدول
+    subjects.forEach((s, idx) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <div class="matiere">
+          <div class="name" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</div>
+          <div class="coef">Coefficient : ${s.coef}</div>
+        </div>
+        <div class="coefBox" aria-label="Coefficient">${s.coef}</div>
+        <div>
+          <input
+            inputmode="decimal"
+            type="text"
+            placeholder="Ex: 12,5"
+            data-index="${idx}"
+            aria-label="Note ${escapeHtml(s.name)}"
+          />
+        </div>
+      `;
+      table.appendChild(row);
+    });
+
+    // حساب تلقائي عند الكتابة
+    table.addEventListener("input", (e) => {
+      if (e.target && e.target.matches('input[type="text"]')) {
+        calculate(false);
+      }
+    });
+
+    document.getElementById("btnCalc").addEventListener("click", () => calculate(true));
+    document.getElementById("btnReset").addEventListener("click", resetAll);
+
+    function parseNote(str){
+      if (!str) return null;
+      // يقبل 12,5 أو 12.5
+      const normalized = String(str).trim().replace(",", ".");
+      if (normalized === "") return null;
+      const val = Number(normalized);
+      if (!Number.isFinite(val)) return NaN;
+      return val;
+    }
+
+    function calculate(showMessages){
+      const inputs = table.querySelectorAll('input[type="text"]');
+
+      let sum = 0;
+      let coefUsed = 0;
+      let hasInvalid = false;
+      let filledCount = 0;
+
+      inputs.forEach(inp => {
+        const idx = Number(inp.dataset.index);
+        const noteRaw = inp.value;
+        const note = parseNote(noteRaw);
+
+        // reset style
+        inp.style.borderColor = "rgba(255,255,255,.12)";
+        inp.style.boxShadow = "none";
+
+        if (noteRaw.trim() === "") return; // ignore empty
+        filledCount++;
+
+        if (Number.isNaN(note) || note < 0 || note > 20){
+          hasInvalid = true;
+          inp.style.borderColor = "rgba(255,204,102,.70)";
+          inp.style.boxShadow = "0 0 0 4px rgba(255,204,102,.14)";
+          return;
+        }
+
+        sum += note * subjects[idx].coef;
+        coefUsed += subjects[idx].coef;
+      });
+
+      if (filledCount === 0){
+        moyenneEl.textContent = "—";
+        sumPondereEl.textContent = "—";
+        coefPrisEl.textContent = "—";
+        resultBox.classList.remove("ok","warn");
+        if (showMessages) showToast("Saisis au moins une note pour calculer.", "warn");
+        else hideToast();
+        return;
+      }
+
+      if (hasInvalid){
+        moyenneEl.textContent = "—";
+        sumPondereEl.textContent = formatNumber(sum, 2);
+        coefPrisEl.textContent = coefUsed ? String(coefUsed) : "—";
+        resultBox.classList.remove("ok");
+        resultBox.classList.add("warn");
+        if (showMessages) showToast("Certaines notes sont invalides (doivent être entre 0 et 20).", "warn");
+        else hideToast();
+        return;
+      }
+
+      const avg = sum / coefUsed;
+
+      moyenneEl.textContent = formatNumber(avg, 2);
+      sumPondereEl.textContent = formatNumber(sum, 2);
+      coefPrisEl.textContent = String(coefUsed);
+
+      resultBox.classList.remove("warn");
+      resultBox.classList.add("ok");
+      if (showMessages) showToast("Moyenne calculée avec succès ✅", "ok");
+      else hideToast();
+    }
+
+    function resetAll(){
+      const inputs = table.querySelectorAll('input[type="text"]');
+      inputs.forEach(inp => {
+        inp.value = "";
+        inp.style.borderColor = "rgba(255,255,255,.12)";
+        inp.style.boxShadow = "none";
+      });
+      moyenneEl.textContent = "—";
+      sumPondereEl.textContent = "—";
+      coefPrisEl.textContent = "—";
+      resultBox.classList.remove("ok","warn");
+      showToast("Réinitialisé.", "ok");
+    }
+
+    function formatNumber(x, decimals){
+      return x.toLocaleString("fr-FR", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function showToast(msg, kind){
+      toast.textContent = msg;
+      toast.className = "toast show " + (kind === "warn" ? "warn" : "ok");
+    }
+    function hideToast(){
+      toast.className = "toast";
+      toast.textContent = "";
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // حساب أولي (يعرض فراغ)
+    calculate(false);
+  </script>
+</body>
+</html>
